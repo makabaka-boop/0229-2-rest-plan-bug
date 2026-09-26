@@ -535,7 +535,9 @@ export function planRestCompletion(result: Omit<VerifyResult, "restPlan">): Rest
     }
   });
   const ok = failures.length === 0;
-  return { ok, items, failures };
+  // 原子性：任一缺口段不可组成时整份清单为空，绝不携带可补声部的部分休止符，
+  // 外部读取者不会误以为已有可执行的补齐计划；失败位置仍在 failures 中逐一列出。
+  return { ok, items: ok ? items : [], failures };
 }
 
 // ---------- 导出 JSON（bigint 安全，引用同一份核对结果） ----------

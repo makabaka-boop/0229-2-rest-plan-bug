@@ -40,10 +40,21 @@ function seedVoices(): { voices: InputVoice[] } {
 }
 
 function signatureOf(ts: TimeSignatureInput, voices: InputVoice[]): string {
-  return JSON.stringify({ ts, voices: voices.map((voice) => ({
-    ...voice,
-    events: voice.events.map((event) => ({ id: event.id, bar: event.bar, denom: event.denom })),
-  })) });
+  // 编辑、核对、时间轴、报告与下载必须共享同一输入快照：事件的附点/三连音
+  // 即使不改分母也会改变时值，必须纳入指纹（连同全部输入字段）。
+  return JSON.stringify({
+    ts,
+    voices: voices.map((voice) => ({
+      name: voice.name,
+      events: voice.events.map((event) => ({
+        id: event.id,
+        bar: event.bar,
+        denom: event.denom,
+        dotted: event.dotted,
+        triplet: event.triplet,
+      })),
+    })),
+  });
 }
 
 export default function App() {

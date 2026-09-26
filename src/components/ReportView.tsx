@@ -20,7 +20,7 @@ export function ReportView({ result, stale }: Props) {
         <button
           type="button"
           className="primary"
-          disabled={false}
+          disabled={stale}
           onClick={() => downloadResult(result)}
           data-testid="download-json"
           title={stale ? "输入已修改，重新核对后才能下载当前结论" : "下载本结论 JSON"}

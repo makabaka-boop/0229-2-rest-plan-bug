@@ -15,6 +15,20 @@ describe("核对台集成：编辑撤销旧结论", () => {
     expect(screen.getByTestId("download-json")).toBeDisabled();
   });
 
+  it("只改三连音也使旧报告与下载失效，重新核对后恢复", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    // 第 1 声部第 7 个事件是普通四分音符；勾选三连音（不动分母）时值即变为 1/6
+    const triplet = screen.getAllByLabelText("三连音 7")[0];
+    await user.click(triplet);
+    expect(screen.getByTestId("stale-badge")).toBeInTheDocument();
+    expect(screen.getByTestId("download-json")).toBeDisabled();
+
+    await user.click(screen.getByTestId("run-check"));
+    expect(screen.queryByTestId("stale-badge")).toBeNull();
+    expect(screen.getByTestId("download-json")).toBeEnabled();
+  });
+
   it("初始结论有效；修改事件后出现失效提示并禁止下载 JSON，重新核对后恢复", async () => {
     const user = userEvent.setup();
     render(<App />);

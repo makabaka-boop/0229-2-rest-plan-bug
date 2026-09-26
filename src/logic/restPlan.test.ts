@@ -308,6 +308,38 @@ describe("planRestCompletion 补齐规划", () => {
     expect(parsed.restPlan.items[0].triplet).toBe(false);
   });
 
+  it("不可补齐与可补齐缺口并存时，下载数据中的清单整体为空并记录失败位置", () => {
+    // 同一次核对：B 缺口 1/192 无法组成，C 缺口 1/2 本可组成
+    const r = verifyScore(ts44, [
+      voice("A", [ev(1, 1)]),
+      voice("B", [
+        ev(1, 1, { triplet: true }),
+        ev(1, 4),
+        ev(1, 32, { dotted: true }),
+        ev(1, 32),
+      ]),
+      voice("C", [ev(1, 2)]),
+    ]);
+    // 报告数据（即下载 JSON 序列化前的同一份结果）：可补声部的休止符不得外泄
+    expect(r.restPlan.ok).toBe(false);
+    expect(r.restPlan.items).toEqual([]);
+    expect(r.restPlan.failures).toMatchObject([
+      { voiceIndex: 1, voiceName: "B", bar: 1, ticks: 1 },
+    ]);
+
+    const parsed = JSON.parse(resultToJSON(r));
+    expect(parsed.restPlan.ok).toBe(false);
+    expect(parsed.restPlan.items).toEqual([]);
+    expect(parsed.restPlan.failures).toHaveLength(1);
+    expect(parsed.restPlan.failures[0]).toMatchObject({
+      voiceIndex: 1,
+      voiceName: "B",
+      bar: 1,
+      ticks: 1,
+      start: { __frac__: { n: "191", d: "192" } },
+    });
+  });
+
   it("不可补齐时 JSON 记录具体缺口而非部分清单", () => {
     const r = verifyScore(ts44, [
       voice("A", [ev(1, 1)]),
