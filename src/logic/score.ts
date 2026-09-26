@@ -535,7 +535,8 @@ export function planRestCompletion(result: Omit<VerifyResult, "restPlan">): Rest
     }
   });
   const ok = failures.length === 0;
-  return { ok, items, failures };
+  // 任一缺口失败时清单整体为空（不交付貌似可执行的部分清单），失败位置由 failures 列出
+  return { ok, items: ok ? items : [], failures };
 }
 
 // ---------- 导出 JSON（bigint 安全，引用同一份核对结果） ----------

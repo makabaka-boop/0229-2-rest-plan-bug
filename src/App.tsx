@@ -42,7 +42,13 @@ function seedVoices(): { voices: InputVoice[] } {
 function signatureOf(ts: TimeSignatureInput, voices: InputVoice[]): string {
   return JSON.stringify({ ts, voices: voices.map((voice) => ({
     ...voice,
-    events: voice.events.map((event) => ({ id: event.id, bar: event.bar, denom: event.denom })),
+    events: voice.events.map((event) => ({
+      id: event.id,
+      bar: event.bar,
+      denom: event.denom,
+      dotted: event.dotted,
+      triplet: event.triplet,
+    })),
   })) });
 }
 
